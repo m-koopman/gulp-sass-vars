@@ -1,6 +1,6 @@
 {
-  "name": "gulp-sass-vars",
-  "description": "SASS variable compiler for JSON.",
+  "name": "gulp-style-vars",
+  "description": "Single source for frontend variables, compiling to SASS and JS.",
   "version": "1.0.0",
   "author": "Max Koopman",
   "contributors": [
@@ -8,8 +8,8 @@
     "Kanye"
   ],
   "license": "MIT",
-  "repository": "m-koopman/gulp-sass-vars",
-  "homepage": "https://github.com/m-koopman/gulp-sass-vars",
+  "repository": "m-koopman/gulp-style-vars",
+  "homepage": "https://github.com/m-koopman/gulp-style-vars",
   "keywords": [
     "gulp",
     "sass",

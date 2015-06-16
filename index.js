@@ -14,9 +14,9 @@ function escapeCharacters(str) {
     });
 }
 
-var SassVars = {};
+var StyleVars = {};
 
-SassVars.sass = function() {
+StyleVars.sass = function() {
     return through(processJSON);
 
     function processJSON(file) {
@@ -90,27 +90,78 @@ SassVars.sass = function() {
     }
 };
 
-
-
-
-SassVars.toSass = function(src_globs, dest_folder) {
-    var label = build.globsToString(src_globs);
+StyleVars.toSass = function(src_globs, dest_folder, opts) {
+    opts = opts || {};
+    opts.prefix = opts.prefix || "_";
+    opts.extension = opts.extension || ".scss";
+    opts.label = opts.label || build.globsToString(src_globs);
 
     var sassComplete = function() {
         build.log( " vars ",
-            gutil.colors.cyan( label ),
+            gutil.colors.cyan( opts.label ),
             "JSON files compiled to SASS in",
             gutil.colors.cyan( dest_folder ) );
     };
 
     gulp.src( src_globs )
-        .pipe( SassVars.sass() )
+        .pipe( StyleVars.sass() )
         .pipe( rename({
-            prefix: "_",
-            extname: ".scss"
+            prefix: opts.prefix,
+            extname: opts.extension
         }))
         .pipe( gulp.dest( dest_folder ).on("finish", sassComplete) );
 };
 
-module.exports = SassVars;
+StyleVars.jsmodule = function(opts) {
+    opts = opts || {};
+    opts.definition = opts.definition || "";
+    opts.indent = opts.indent || 4;
 
+    return through(processJSON);
+
+    function processJSON(file) {
+        var JSONObj;
+        // load the JSON
+        try {
+            JSONObj = JSON.parse(file.contents);
+        } catch (e) {
+            build.log( "! vars ", "Invalid JSON at", file.path );
+            return;
+        }
+
+        var js = opts.definition + JSON.stringify( JSONObj, null, opts.indent ) + ";";
+
+        file.contents = Buffer(js);
+        this.push(file);
+    }
+};
+
+StyleVars.toModule = function(src_globs, dest_folder, opts) {
+    opts = opts || {};
+    opts.prefix = opts.prefix || "";
+    opts.extension = opts.extension || ".js";
+    opts.label = opts.label || build.globsToString(src_globs);
+    opts.definition = opts.definition || "module.exports = ";
+    opts.indent = opts.indent || 4;
+
+
+    var jsComplete = function() {
+        build.log( " vars ",
+            gutil.colors.cyan( opts.label ),
+            "JSON files compiled to Bundle JS in",
+            gutil.colors.cyan( dest_folder ) );
+    };
+
+    gulp.src( src_globs )
+        .pipe( StyleVars.jsmodule({
+            definition: opts.definition,
+            indent: opts.indent
+            }))
+        .pipe( rename({
+            prefix: opts.prefix,
+            extname: opts.extension
+        }))
+        .pipe( gulp.dest( dest_folder ).on("finish", jsComplete) );
+};
+
+module.exports = StyleVars;
