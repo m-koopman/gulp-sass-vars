@@ -80,7 +80,7 @@ StyleVars.sass = function(opts) {
                 for ( i = 0; i < keys.length; i++ ) {
                     var key = escapeCharacters( keys[ i ] );
                     var row = "";
-                    row += "$" + key + ": ";
+                    row += "\"$" + key + "\": ";
                     row += sassParseJSONRecursive( obj[ key ], depth + 1 );
                     rows.push( spacesFor( depth + 1 ) + row );
                 }
