@@ -19,7 +19,6 @@ function escapeCharacters(str) {
 var StyleVars = {};
 
 var parseFile = function( file ) {
-
     var JSONObj;
     try {
         JSONObj = eval( "(" + file.contents + ")()" );
@@ -32,11 +31,18 @@ var parseFile = function( file ) {
     return JSONObj;
 };
 
-StyleVars.sass = function() {
+StyleVars.sass = function(opts) {
+    opts = opts || {};
+    opts.indent = opts.indent || 4;
+
+    var indentSpaces = "";
+    for ( var i = 0; i < opts.indent; i++ ) {
+        indentSpaces += " ";
+    }
+
     return through(processFile);
 
     function processFile(file) {
-
         var JSONObj = parseFile( file );
 
         if ( JSONObj === undefined ) {
@@ -47,7 +53,7 @@ StyleVars.sass = function() {
         var spacesFor = function( depth ) {
             var s = "";
             for ( var i = 0; i < depth; i++ ) {
-                s += "  ";
+                s += indentSpaces;
             }
             return s;
         };
@@ -108,6 +114,7 @@ StyleVars.toSass = function(src_globs, dest_folder, opts) {
     opts = opts || {};
     opts.prefix = opts.prefix || "_";
     opts.extension = opts.extension || ".scss";
+    opts.indent = opts.indent || 4;
     opts.label = opts.label || build.globsToString(src_globs);
 
     var sassComplete = function() {
