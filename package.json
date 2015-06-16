@@ -1,0 +1,32 @@
+{
+  "name": "gulp-sass-vars",
+  "description": "SASS variable compiler for JSON.",
+  "version": "1.0.0",
+  "author": "Max Koopman",
+  "contributors": [
+    "Ben Follington",
+    "Kanye"
+  ],
+  "license": "MIT",
+  "repository": "m-koopman/gulp-sass-vars",
+  "homepage": "https://github.com/m-koopman/gulp-sass-vars",
+  "keywords": [
+    "gulp",
+    "sass",
+    "build"
+  ],
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-build-tools": "^1.0.4",
+    "gulp-rename": "^1.2.2",
+    "gulp-util": "^3.0.5",
+    "through": "^2.3.7"
+  }
+}
