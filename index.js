@@ -122,6 +122,10 @@ StyleVars.toSass = function(src_globs, dest_folder, opts) {
             gutil.colors.cyan( opts.label ),
             "JS files compiled to SASS at",
             gutil.colors.cyan( dest_folder ) );
+
+        if ( opts.cb ) {
+            opts.cb();
+        }
     };
 
     gulp.src( src_globs )
@@ -169,6 +173,10 @@ StyleVars.toModule = function(src_globs, dest_folder, opts) {
             gutil.colors.cyan( opts.label ),
             "JS files compiled to JS module at",
             gutil.colors.cyan( dest_folder ) );
+
+        if ( opts.cb ) {
+            opts.cb();
+        }
     };
 
     gulp.src( src_globs )
