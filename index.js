@@ -6,27 +6,41 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     build = require('gulp-build-tools/build');
 
-// from http://stackoverflow.com/questions/17191265/legal-characters-for-sass-and-scss-variable-names
-var escapableCharactersRegex = /(["!#$%&\'()*+,.\/:;\s<=>?@\[\]^\{\}|~])/g;
 function escapeCharacters(str) {
-    return str.replace(escapableCharactersRegex, function(a,b) {
+    //pass
+    return str;
+    /*
+    return str.replace(/(["!#$%&\'()*+,.\/:;\s<=>?@\[\]^\{\}|~])/g, function(a,b) {
         return '\\' + b;
     });
+    */
 }
 
 var StyleVars = {};
 
+var parseFile = function( file ) {
+
+    var JSONObj;
+    try {
+        JSONObj = eval( "(" + file.contents + ")()" );
+    } catch (e) {
+        build.log( "! vars ", "Invalid JS at", gutil.colors.cyan( file.path ), ":", "" + e );
+        build.error( "Variable Build", file.path+ ": \n" + e );
+        return;
+    }
+
+    return JSONObj;
+};
+
 StyleVars.sass = function() {
-    return through(processJSON);
+    return through(processFile);
 
-    function processJSON(file) {
+    function processFile(file) {
 
-        var JSONObj;
-        // load the JSON
-        try {
-            JSONObj = JSON.parse(file.contents);
-        } catch (e) {
-            build.log( "! vars ", "Invalid JSON at", file.path );
+        var JSONObj = parseFile( file );
+
+        if ( JSONObj === undefined ) {
+            this.emit('error');
             return;
         }
 
@@ -38,7 +52,7 @@ StyleVars.sass = function() {
             return s;
         };
 
-        var parseJsonRecursive = function( obj, depth ) {
+        var sassParseJSONRecursive = function( obj, depth ) {
             var s = "",
                 i,
                 rows;
@@ -46,7 +60,7 @@ StyleVars.sass = function() {
                 s += "(\n";
                 rows = [];
                 for ( i = 0; i < obj.length; i++ ) {
-                    var val = parseJsonRecursive( obj[ i ], depth + 1 );
+                    var val = sassParseJSONRecursive( obj[ i ], depth + 1 );
                     val = escapeCharacters( val );
                     rows.push( spacesFor( depth + 1 ) + val );
                 }
@@ -61,7 +75,7 @@ StyleVars.sass = function() {
                     var key = escapeCharacters( keys[ i ] );
                     var row = "";
                     row += "$" + key + ": ";
-                    row += parseJsonRecursive( obj[ key ], depth + 1 );
+                    row += sassParseJSONRecursive( obj[ key ], depth + 1 );
                     rows.push( spacesFor( depth + 1 ) + row );
                 }
                 s += rows.join( ",\n" );
@@ -73,17 +87,17 @@ StyleVars.sass = function() {
             return s;
         };
 
-        var parseJson = function( obj ) {
+        var sassParseJSON = function( obj ) {
             var s = "";
             var keys = Object.keys( obj );
             for ( var i = 0; i < keys.length; i++ ) {
                 var key = keys[ i ];
-                s += "$" + key + ": " + parseJsonRecursive( obj[ key ], 0 ) + ";\n";
+                s += "$" + key + ": " + sassParseJSONRecursive( obj[ key ], 0 ) + ";\n";
             }
             return s;
         };
 
-        var sass = parseJson(JSONObj);
+        var sass = sassParseJSON(JSONObj);
 
         file.contents = Buffer(sass);
         this.push(file);
@@ -104,7 +118,7 @@ StyleVars.toSass = function(src_globs, dest_folder, opts) {
     };
 
     gulp.src( src_globs )
-        .pipe( StyleVars.sass() )
+        .pipe( StyleVars.sass().on('error', function() {}) )
         .pipe( rename({
             prefix: opts.prefix,
             extname: opts.extension
@@ -117,15 +131,13 @@ StyleVars.jsmodule = function(opts) {
     opts.definition = opts.definition || "";
     opts.indent = opts.indent || 4;
 
-    return through(processJSON);
+    return through(processFile);
 
-    function processJSON(file) {
-        var JSONObj;
-        // load the JSON
-        try {
-            JSONObj = JSON.parse(file.contents);
-        } catch (e) {
-            build.log( "! vars ", "Invalid JSON at", file.path );
+    function processFile(file) {
+        var JSONObj = parseFile( file );
+
+        if ( JSONObj === undefined ) {
+            this.emit('error');
             return;
         }
 
@@ -156,7 +168,7 @@ StyleVars.toModule = function(src_globs, dest_folder, opts) {
         .pipe( StyleVars.jsmodule({
             definition: opts.definition,
             indent: opts.indent
-            }))
+            }).on('error', function() {} ))
         .pipe( rename({
             prefix: opts.prefix,
             extname: opts.extension
