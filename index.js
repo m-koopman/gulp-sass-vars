@@ -120,7 +120,7 @@ StyleVars.toSass = function(src_globs, dest_folder, opts) {
     var sassComplete = function() {
         build.log( " vars ",
             gutil.colors.cyan( opts.label ),
-            "JSON files compiled to SASS in",
+            "JS files compiled to SASS at",
             gutil.colors.cyan( dest_folder ) );
     };
 
@@ -167,7 +167,7 @@ StyleVars.toModule = function(src_globs, dest_folder, opts) {
     var jsComplete = function() {
         build.log( " vars ",
             gutil.colors.cyan( opts.label ),
-            "JSON files compiled to Bundle JS in",
+            "JS files compiled to JS module at",
             gutil.colors.cyan( dest_folder ) );
     };
 
