@@ -1,10 +1,9 @@
 {
   "name": "gulp-style-vars",
-  "description": "Single source for frontend variables, compiling to SASS and JS.",
-  "version": "1.0.0",
+  "description": "A single source for frontend variables, compiling to SASS and JS.",
+  "version": "1.0.1",
   "author": "Max Koopman",
   "contributors": [
-    "Ben Follington",
     "Kanye"
   ],
   "license": "MIT",
@@ -13,7 +12,9 @@
   "keywords": [
     "gulp",
     "sass",
-    "build"
+    "build",
+    "variables",
+    "style"
   ],
   "engines": {
     "node": ">= 0.10.0"
@@ -21,8 +22,7 @@
   "files": [
     "index.js"
   ],
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "gulp": "^3.9.0",
     "gulp-build-tools": "^1.0.4",
     "gulp-rename": "^1.2.2",
